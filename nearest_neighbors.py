@@ -72,7 +72,6 @@ def visualize(points):
     for p in points:
         plt.plot(p.x, p.y, 'bo')  # синя точка
         plt.text(p.x + 0.5, p.y + 0.5, f'{p.index}', fontsize=9)
-
         if p.nearest:
             dx = p.nearest.x - p.x
             dy = p.nearest.y - p.y
@@ -89,52 +88,57 @@ def visualize(points):
     plt.axis("equal")
     plt.show()
 
-# Функція для отримання введення від користувача
-def get_user_input():
-    print("Виберіть спосіб введення точок:")
-    print("1. Ввести точки вручну (наприклад, (1, 2), (3, 4))")
-    print("2. Автоматично згенерувати точки")
-    choice = input("Введіть 1 або 2: ")
-
+# Функція для ручного введення точок
+def manual_input():
     points = []
-    if choice == "1":
-        print("Введіть координати точок у форматі (x, y), наприклад: (1, 2). Введіть 'done' для завершення.")
-        i = 0
-        while True:
-            user_input = input(f"Точка {i}: ")
-            if user_input.lower() == 'done':
-                if len(points) < 2:
-                    print("Потрібно ввести принаймні 2 точки!")
-                    continue
-                break
-            try:
-                # Очікуємо формат "(x, y)"
-                x, y = map(float, user_input.strip("() ").split(","))
-                points.append(Point(x, y, i))
-                i += 1
-            except ValueError:
-                print("Некоректний формат! Введіть у форматі (x, y), наприклад: (1, 2)")
-        return points
-    elif choice == "2":
-        while True:
-            try:
-                N = int(input("Введіть кількість точок (2–10000): "))
-                if 2 <= N <= 10000:
-                    break
-                print("Кількість точок має бути від 2 до 10000!")
-            except ValueError:
-                print("Введіть ціле число!")
-        random.seed(42)
-        points = [Point(random.uniform(0, 100), random.uniform(0, 100), i) for i in range(N)]
-        return points
-    else:
-        print("Невірний вибір! Використано автоматичну генерацію з N=30.")
-        random.seed(42)
-        return [Point(random.uniform(0, 100), random.uniform(0, 100), i) for i in range(30)]
+    print("Введіть координати точок у форматі (x,y), наприклад: (1,2). Введіть 'done' для завершення.")
+    index = 0
+    while True:
+        user_input = input(f"Точка {index}: ")
+        if user_input.lower() == 'done':
+            if len(points) < 2:
+                print("Потрібно ввести принаймні 2 точки!")
+                continue
+            break
+        try:
+            # Парсимо введений рядок, видаляємо дужки та розбиваємо на x, y
+            x, y = map(float, user_input.strip('() ').split(','))
+            points.append(Point(x, y, index))
+            index += 1
+        except ValueError:
+            print("Невірний формат! Введіть координати у форматі (x,y), наприклад: (1,2)")
+    return points
 
-# === Точка входу ===
+# Функція для автоматичної генерації точок
+def auto_input():
+    while True:
+        try:
+            N = int(input("Введіть кількість точок (наприклад, 30): "))
+            if N < 2:
+                print("Кількість точок має бути не меншою за 2!")
+                continue
+            break
+        except ValueError:
+            print("Введіть ціле число!")
+    random.seed(42)
+    return [Point(random.uniform(0, 100), random.uniform(0, 100), i) for i in range(N)]
+
+# Точка входу
 def main():
-    points = get_user_input()
+    print("Виберіть режим введення даних:")
+    print("1. Ручне введення координат")
+    print("2. Автоматична генерація точок")
+    while True:
+        choice = input("Введіть 1 або 2: ")
+        if choice in ['1', '2']:
+            break
+        print("Невірний вибір! Введіть 1 або 2.")
+
+    if choice == '1':
+        points = manual_input()
+    else:
+        points = auto_input()
+
     closest_neighbors(points)
     visualize(points)
 
