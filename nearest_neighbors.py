@@ -89,12 +89,52 @@ def visualize(points):
     plt.axis("equal")
     plt.show()
 
+# Функція для отримання введення від користувача
+def get_user_input():
+    print("Виберіть спосіб введення точок:")
+    print("1. Ввести точки вручну (наприклад, (1, 2), (3, 4))")
+    print("2. Автоматично згенерувати точки")
+    choice = input("Введіть 1 або 2: ")
+
+    points = []
+    if choice == "1":
+        print("Введіть координати точок у форматі (x, y), наприклад: (1, 2). Введіть 'done' для завершення.")
+        i = 0
+        while True:
+            user_input = input(f"Точка {i}: ")
+            if user_input.lower() == 'done':
+                if len(points) < 2:
+                    print("Потрібно ввести принаймні 2 точки!")
+                    continue
+                break
+            try:
+                # Очікуємо формат "(x, y)"
+                x, y = map(float, user_input.strip("() ").split(","))
+                points.append(Point(x, y, i))
+                i += 1
+            except ValueError:
+                print("Некоректний формат! Введіть у форматі (x, y), наприклад: (1, 2)")
+        return points
+    elif choice == "2":
+        while True:
+            try:
+                N = int(input("Введіть кількість точок (2–10000): "))
+                if 2 <= N <= 10000:
+                    break
+                print("Кількість точок має бути від 2 до 10000!")
+            except ValueError:
+                print("Введіть ціле число!")
+        random.seed(42)
+        points = [Point(random.uniform(0, 100), random.uniform(0, 100), i) for i in range(N)]
+        return points
+    else:
+        print("Невірний вибір! Використано автоматичну генерацію з N=30.")
+        random.seed(42)
+        return [Point(random.uniform(0, 100), random.uniform(0, 100), i) for i in range(30)]
+
 # === Точка входу ===
 def main():
-    random.seed(42)
-    N = 50  # Кількість точок
-    points = [Point(random.uniform(0, 100), random.uniform(0, 100), i) for i in range(N)]
-
+    points = get_user_input()
     closest_neighbors(points)
     visualize(points)
 
